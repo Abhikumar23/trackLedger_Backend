@@ -17,7 +17,7 @@ const friendsRoute = require("./routes/friendsRoute");
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: 'https://track-ledger-frontend-8tlx.vercel.app',
   credentials: true,
 }));
 app.use(express.json());
