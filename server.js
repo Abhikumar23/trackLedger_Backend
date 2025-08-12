@@ -16,16 +16,16 @@ const resetPasswordRoutes = require("./routes/resetPassword");
 const friendsRoute = require("./routes/friendsRoute");
 
 // Middleware
-app.use(cors({
+const corsOptions = {
   origin: 'https://track-ledger-frontend-8tlx.vercel.app',
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-// Preflight request handler for all routes
-app.options('*', cors({
-  origin: 'https://track-ledger-frontend-8tlx.vercel.app',
-  credentials: true,
-}));
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -44,7 +44,7 @@ app.use("/api/reset-password", resetPasswordRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/friends", friendsRoute);
 
-const port = 4000;
+const port = 'https://track-ledger-backend.vercel.app';
 app.listen(port, () => {
   console.log(`🚀 App is running on http://localhost:${port}`);
 });
