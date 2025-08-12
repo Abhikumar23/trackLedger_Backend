@@ -44,7 +44,7 @@ app.use("/api/reset-password", resetPasswordRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/friends", friendsRoute);
 
-const port = 'https://track-ledger-backend.vercel.app';
+const port = 4000;
 app.listen(port, () => {
   console.log(`🚀 App is running on http://localhost:${port}`);
 });
