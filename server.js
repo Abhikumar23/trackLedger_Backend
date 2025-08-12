@@ -20,6 +20,13 @@ app.use(cors({
   origin: 'https://track-ledger-frontend-8tlx.vercel.app',
   credentials: true,
 }));
+
+// Preflight request handler for all routes
+app.options('*', cors({
+  origin: 'https://track-ledger-frontend-8tlx.vercel.app',
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
