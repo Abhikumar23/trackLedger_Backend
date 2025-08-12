@@ -8,15 +8,15 @@ const {
   getAllTransactionLogs
 } = require("../controllers/transactionLog");
 
-// const requireAuth = require('../middleware/requireAuth');
+// GET all logs for the user
+router.get("/", getAllTransactionLogs);
 
-// router.use(requireAuth);
+// GET logs for a specific transaction
+router.get("/transaction/:transactionId", getTransactionLog);
 
-// Just define the relative paths here
+// These routes would be for individual log operations (if needed)
 router.post("/", createTransactionLog);
 router.put("/:id", updateTransactionLog);
 router.delete("/:id", deleteTransactionLog);
-router.get("/:id", getTransactionLog); // if you want logs per transaction
-router.get("/", getAllTransactionLogs)
 
 module.exports = router;

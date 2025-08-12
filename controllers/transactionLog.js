@@ -134,13 +134,14 @@ exports.deleteTransactionLog = async (req, res) => {
 };
 
 // GET logs for a single transaction
+// GET logs for a single transaction
 exports.getTransactionLog = async (req, res) => {
   try {
     const userId = getUserIdFromToken(req);
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const logs = await TransactionLog.find({
-      transactionId: req.params.id,
+      transactionId: req.params.transactionId, // Changed from req.params.id
       user: userId
     }).sort({ timestamp: -1 });
 

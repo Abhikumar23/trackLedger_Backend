@@ -11,9 +11,10 @@ router.use(requireAuth);  // 🔐 Protect all transaction routes
 
 router.post('/', createTransaction);
 router.get('/', getTransaction);
+// Put specific routes BEFORE parameter routes
+router.get('/monthly-summary', monthlySummery);  
+router.get('/:id', findTransaction);             
 router.put('/:id', putTransaction);
 router.delete('/:id', deleteTransaction);
-router.get('/monthly-summary', monthlySummery);
-router.get('/:id', findTransaction);
 
 module.exports = router;
