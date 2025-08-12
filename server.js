@@ -5,13 +5,29 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const connectDb = require("./database/db");
 
+// 🔍 Route logger
+function logRoutes(appOrRouter) {
+  ["use", "get", "post", "put", "delete", "patch"].forEach((method) => {
+    const original = appOrRouter[method];
+    appOrRouter[method] = function (path, ...rest) {
+      if (typeof path === "string") {
+        console.log(`[ROUTE] ${method.toUpperCase()} ${path}`);
+      }
+      return original.call(this, path, ...rest);
+    };
+  });
+}
+
+logRoutes(app); // Call right after app is created
+
+// Connect to DB
 connectDb();
 
 // CORS config
 const corsOptions = {
   origin: [
     "https://track-ledger-frontend-8tlx.vercel.app",
-    "http://localhost:3000"
+    "http://localhost:3000",
   ],
   credentials: true,
   methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
