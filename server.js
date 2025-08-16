@@ -17,15 +17,11 @@ const friendsRoute = require("./routes/friendsRoute");
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: "https://track-ledger-frontend-os71.vercel.app",
   credentials: true,
 }));
 
-// Preflight request handler for all routes
-// app.options('*', cors({
-//   origin: 'https://track-ledger-frontend-8tlx.vercel.app',
-//   credentials: true,
-// }));
+
 
 app.use(express.json());
 app.use(cookieParser());
