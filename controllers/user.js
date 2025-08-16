@@ -2,6 +2,8 @@ const User = require('../model/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const mailSender = require("../utils/mailSender");
+const cloudinary = require("cloudinary").v2;
+
 require("dotenv").config();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
@@ -85,7 +87,9 @@ exports.createLogin = async (req, res) => {
 
 // ✅ Get current logged-in user profile
 exports.getProfile = (req, res) => {
+
   const { token } = req.cookies;
+
   if (!token) return res.status(401).json({ error: 'No token' });
 
   jwt.verify(token, jwtSecret, async (err, userData) => {
@@ -121,6 +125,14 @@ exports.createLogout = (req, res) => {
   }).json({ message: 'Logged out' });
 };
 
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
 exports.uploadImage = async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: "No token" });
@@ -128,18 +140,34 @@ exports.uploadImage = async (req, res) => {
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) return res.status(403).json({ error: "Invalid token" });
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userData.id,
-      { profileImage: req.file.filename },
-      { new: true }
-    );
+    try {
+      // Upload file buffer directly to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "profile_images" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
 
-    res.json({
-      message: "Image uploaded",
-      filename: req.file.filename,
-      url: `http://localhost:4000/uploads/${req.file.filename}`,
-      user: updatedUser,
-    });
+      // Update user in DB with Cloudinary URL
+      const updatedUser = await User.findByIdAndUpdate(
+        userData.id,
+        { profileImage: result.secure_url },
+        { new: true }
+      );
+
+      res.json({
+        message: "Image uploaded",
+        url: result.secure_url,
+        user: updatedUser,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   });
 };
 

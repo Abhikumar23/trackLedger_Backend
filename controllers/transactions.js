@@ -18,7 +18,7 @@ function getUserIdFromToken(req, res) {
 }
 
 exports.createTransaction = async (req, res) => {
-  const userId = getUserIdFromToken(req, res);                       // fixes here
+  const userId = getUserIdFromToken(req, res);        
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
   const { name, date, description, price, category } = req.body;
