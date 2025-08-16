@@ -120,7 +120,7 @@ exports.createLogout = (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
     sameSite: 'lax',
-    secure: false, // true only in production with HTTPS
+    secure: true, // true only in production with HTTPS
     expires: new Date(0),
   }).json({ message: 'Logged out' });
 };
