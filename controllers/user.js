@@ -174,6 +174,10 @@ exports.uploadImage = async (req, res) => {
 exports.sendRegistrationOtp = async (req, res) => {
   const { name, email, password } = req.body;
 
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, message: "All fields are required" });
+  }
+
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -183,30 +187,38 @@ exports.sendRegistrationOtp = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpiry = Date.now() + 5 * 60 * 1000;
 
-    // Temporarily store in user document (optional: use a separate PendingUser model)
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ name, email, password: hashedPassword });
-    }
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      otp,
+      otpExpiry,
+      isVerified: false
+    });
 
-    user.otp = otp;
-    user.otpExpiry = otpExpiry;
     await user.save();
 
-    await mailSender(
-      email,
-      "Your Registration OTP",
-      `<p>Your OTP is <b>${otp}</b>. It expires in 5 minutes.</p>`
-    );
+    try {
+      await mailSender(
+        email,
+        "Your Registration OTP",
+        `<p>Your OTP is <b>${otp}</b>. It expires in 5 minutes.</p>`
+      );
+    } catch (mailErr) {
+      console.error("Mail sending failed:", mailErr.message);
+      return res.status(500).json({ success: false, message: "Failed to send OTP email" });
+    }
 
     res.json({ success: true, message: "OTP sent to email" });
+
   } catch (error) {
-    console.error("Send registration OTP error:", error.message);
+    console.error("Send registration OTP error:", error);
     res.status(500).json({ success: false, message: "Failed to send OTP" });
   }
 };
+
 
 exports.verifyOtpAndRegister = async (req, res) => {
   const { email, otp } = req.body;
