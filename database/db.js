@@ -3,10 +3,7 @@ require('dotenv').config();
 
 const connectDb = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URL); // No need for deprecated options
     console.log('✅ MongoDB connected successfully');
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
@@ -15,5 +12,3 @@ const connectDb = async () => {
 };
 
 module.exports = connectDb;
-
-
