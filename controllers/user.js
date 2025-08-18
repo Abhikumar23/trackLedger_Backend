@@ -67,7 +67,11 @@ exports.createLogin = async (req, res) => {
       if (err) throw err;
 
       res
-        .cookie('token', token, { httpOnly: true, sameSite: 'lax',secure: true }, )
+      .cookie('token', token, {
+  httpOnly: true,
+  secure: true,       // must be true on HTTPS
+  sameSite: 'none',   // allows cross-site cookies
+})
         .json({
           status: 'pass ok',
           user: {
@@ -86,41 +90,34 @@ exports.createLogin = async (req, res) => {
 };
 
 // ✅ Get current logged-in user profile
-exports.getProfile = (req, res) => {
-
+exports.getProfile = async (req, res) => {
   const { token } = req.cookies;
 
   if (!token) return res.status(401).json({ error: 'No token' });
 
-  jwt.verify(token, jwtSecret, async (err, userData) => {
-    if (err) {
-      console.error("JWT verify error:", err.message);
-      return res.status(403).json({ error: 'Invalid token' });
-    }
+  try {
+    const userData = jwt.verify(token, jwtSecret);
+    const userDoc = await User.findById(userData.id);
 
-    try {
-      const userDoc = await User.findById(userData.id);
-      if (!userDoc) return res.status(404).json({ error: 'User not found' });
+    if (!userDoc) return res.status(404).json({ error: 'User not found' });
 
-      res.json({
-        name: userDoc.name,
-        email: userDoc.email,
-        _id: userDoc._id,
-        profileImage: userDoc.profileImage || null
-      });
-    } catch (dbErr) {
-      console.error("Database error:", dbErr.message);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+    res.json({
+      name: userDoc.name,
+      email: userDoc.email,
+      _id: userDoc._id,
+      profileImage: userDoc.profileImage || null,
+    });
+  } catch (err) {
+    console.error('JWT verify or DB error:', err.message);
+    res.status(403).json({ error: 'Invalid or expired token' });
+  }
 };
 
-// ✅ Logout current user
 exports.createLogout = (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
-    sameSite: 'lax',
-    secure: true, // true only in production with HTTPS
+    secure: true,      // keep true for HTTPS
+    sameSite: 'none',  // allow cross-site clearing
     expires: new Date(0),
   }).json({ message: 'Logged out' });
 };
