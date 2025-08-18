@@ -67,7 +67,7 @@ exports.createLogin = async (req, res) => {
       if (err) throw err;
 
       res
-        .cookie('token', token, { httpOnly: true })
+        .cookie('token', token, { httpOnly: true, sameSite: 'lax',secure: true }, )
         .json({
           status: 'pass ok',
           user: {
