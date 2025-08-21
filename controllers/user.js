@@ -9,6 +9,7 @@ require("dotenv").config();
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = process.env.JWT_SEC;
 
+/*
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -43,6 +44,7 @@ exports.createUser = async (req, res) => {
     res.status(400).json({ message: 'User registration failed' });
   }
 };
+*/
 
 // ✅ Login existing user
 exports.createLogin = async (req, res) => {
@@ -50,11 +52,13 @@ exports.createLogin = async (req, res) => {
 
   try {
     const userDoc = await User.findOne({ email });
+
     if (!userDoc) {
       return res.status(404).json({ status: 'not found' });
     }
 
     const passOk = bcrypt.compareSync(password, userDoc.password);
+
     if (!passOk) {
       return res.status(422).json({ status: 'password not ok' });
     }
@@ -91,6 +95,7 @@ exports.createLogin = async (req, res) => {
 
 // ✅ Get current logged-in user profile
 exports.getProfile = async (req, res) => {
+
   const { token } = req.cookies;
 
   if (!token) return res.status(401).json({ error: 'No token' });
@@ -113,11 +118,13 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+//LOgout Api
+
 exports.createLogout = (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
-    secure: true,      // keep true for HTTPS
-    sameSite: 'none',  // allow cross-site clearing
+    secure: true,    
+    sameSite: 'none',  
     expires: new Date(0),
   }).json({ message: 'Logged out' });
 };
@@ -131,7 +138,9 @@ cloudinary.config({
 });
 
 exports.uploadImage = async (req, res) => {
+
   const { token } = req.cookies;
+
   if (!token) return res.status(401).json({ error: "No token" });
 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {

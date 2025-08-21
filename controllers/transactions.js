@@ -18,7 +18,9 @@ function getUserIdFromToken(req, res) {
 }
 
 exports.createTransaction = async (req, res) => {
-  const userId = getUserIdFromToken(req, res);        
+
+  const userId = getUserIdFromToken(req, res);   
+
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
   const { name, date, description, price, category } = req.body;
@@ -89,6 +91,7 @@ exports.putTransaction = async (req, res) => {
   res.json({ message: 'Transaction updated successfully', data: updatedTransaction });
 };
 
+
 exports.monthlySummery = async (req, res) => {
   const { token } = req.cookies;
   if (!token) return res.status(401).json({ error: "Not logged in" });
@@ -97,7 +100,7 @@ exports.monthlySummery = async (req, res) => {
     const userData = jwt.verify(token, jwtSecret);  // fixes here
 
     const summary = await Transaction.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(userData.id) } },
+      { $match: { user: new mongoose.Types.ObjectId(userData.id) } },  //we can remove (new)
       {
         $group: {
           _id: {
