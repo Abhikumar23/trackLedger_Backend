@@ -9,7 +9,7 @@ require("dotenv").config();
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = process.env.JWT_SEC;
 
-/*
+
 exports.createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -44,7 +44,7 @@ exports.createUser = async (req, res) => {
     res.status(400).json({ message: 'User registration failed' });
   }
 };
-*/
+
 
 // ✅ Login existing user
 exports.createLogin = async (req, res) => {
