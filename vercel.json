@@ -18,8 +18,5 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "server.js" }
-  ],
-  "optionsAllowlist": [
-    "/api/(.*)"
   ]
 }
