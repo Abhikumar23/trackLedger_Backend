@@ -17,8 +17,16 @@ const friendsRoute = require("./routes/friendsRoute");
 
 // Middleware
 app.use(cors({
-  origin: "https://track-ledger-frontend-os71.vercel.app",
+  origin: "https://track-ledger-frontend-os71.vercel.app", // your frontend
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Explicitly handle OPTIONS
+app.options("*", cors({
+  origin: "https://track-ledger-frontend-os71.vercel.app",
+  credentials: true
 }));
 
 
